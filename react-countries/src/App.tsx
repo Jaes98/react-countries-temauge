@@ -1,6 +1,21 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState } from "react";
 
-const fetchCountryData = async (countryCode) => {
+interface Country {
+  name: { common: string; official: string };
+  capital: string[];
+  borders: string[];
+  population: number;
+  altSpellings: Array<string>;
+  flags: { png: string; svg: string; alt: string };
+  maps: { googleMaps: string };
+}
+
+type CountryInfoProps = {
+  country: Country | null; 
+};
+
+const fetchCountryData = async (countryCode:string): Promise<Country> => {
   const res = await fetch(
     `https://restcountries.com/v3.1/alpha/${countryCode}`
   );
@@ -11,7 +26,7 @@ const fetchCountryData = async (countryCode) => {
 
 export default function App() {
   const [code, setCode] = useState("dk");
-  const [country, setCountry] = useState(null);
+   const [country, setCountry] = useState<Country | null>(null);
 
   const getInfo = async () => {
     const info = await fetchCountryData(code);
@@ -33,8 +48,8 @@ export default function App() {
     </>
   );
 }
-const CountryInfo = (props) => {
-  const country = props.country;
+const CountryInfo = ({country}:CountryInfoProps) => {
+  // const country = props.country;
 
   return country == null ? (
     <p>Enter Country Code above to fetch country info</p>
@@ -47,30 +62,20 @@ const CountryInfo = (props) => {
         src={country.flags.png}
         alt={country.flags.alt}
       />
-      <p>Country Name Common: TODO</p>
-      <p>Country Name Official: TODO</p>
-      <p>Country Capital: TODO</p>
-      <p>Population: TODO</p>
-      <p>Country Borders: TODO</p>
+      <p>Country Name Common: {country.name.common}</p>
+      <p>Country Name Official: {country.name.official}</p>
+      <p>Country Capital: {country.capital[0]}</p>
+      <p>Population: {country.population}</p>
+      <p>Country Borders: {country.borders.join(", ")}</p>
       <h4>Alternative Spellings</h4>
-      <ol>TODO</ol>
-      <a href="TODO" target="_blank">
+      <ol>
+        {country.altSpellings.map((spelling, index) => (
+          <li key={index}>{spelling}</li>
+        ))}
+        </ol>
+      <a href={country.maps.googleMaps} target="_blank">
         Google Maps
       </a>
     </>
   );
-};
-
-interface Country {
-  name: { common: string; official: string };
-  capital: string[];
-  borders: string[];
-  population: number;
-  altSpelling: Array<string>;
-  flags: { png: string; svg: string; alt: string };
-  maps: { googleMaps: string };
-}
-
-type CountryInfoProps = {
-  country: Country | null;
 };
